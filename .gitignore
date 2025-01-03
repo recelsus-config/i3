@@ -1,0 +1,9 @@
+*
+!.gitignore
+
+!config
+!i3status.conf
+!theme.conf
+
+!wallpaper/
+!wallpaper/*.jpg
