@@ -22,7 +22,13 @@ trap cleanup EXIT
 
 interface_exists() {
     local iface="$1"
-    [ -n "$iface" ] && ip link show "$iface" &>/dev/null
+    if [ -z "$iface" ]; then
+        return 1
+    fi
+    if ip link show "$iface" &>/dev/null; then
+        return 0
+    fi
+    return 1
 }
 
 find_battery_device() {
