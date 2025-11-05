@@ -41,7 +41,7 @@ find_battery_device() {
                 continue
             fi
             if [ "$type" = "Battery" ]; then
-                basename "$power_path"
+                printf "%s" "$power_path"
                 return 0
             fi
         fi
@@ -112,11 +112,14 @@ find_temperature_path() {
 }
 
 generate_config() {
-    local battery_device=""
-    if battery_device=$(find_battery_device); then
-        :
-    else
-        battery_device=""
+    # Permit override for battery location
+    local battery_path="${STATUS_BATTERY_PATH:-}"
+    if [ -z "$battery_path" ]; then
+        if battery_path=$(find_battery_device); then
+            :
+        else
+            battery_path=""
+        fi
     fi
 
     local temperature_path=""
@@ -143,7 +146,7 @@ generate_config() {
         if [ "$have_wireless" -eq 1 ]; then
             echo "order += \"wireless ${wireless_iface}\""
         fi
-        if [ -n "$battery_device" ]; then
+        if [ -n "$battery_path" ]; then
             echo "order += \"battery main\""
         fi
         echo "order += \"cpu_usage\""
@@ -205,10 +208,10 @@ disk "/" {
 EOF
         echo ""
 
-        if [ -n "$battery_device" ]; then
+        if [ -n "$battery_path" ]; then
             cat <<EOF
 battery main {
-    device = "$battery_device"
+    path = "$battery_path"
     format = "%status %percentage %remaining"
 }
 EOF
