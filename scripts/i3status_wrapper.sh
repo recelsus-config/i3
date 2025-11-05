@@ -69,8 +69,13 @@ find_temperature_path() {
             fi
             case "$zone_type" in
                 x86_pkg_temp|cpu_thermal|soc_thermal|acpitz|k10temp|pch_cannonlake)
-                    printf '%s' "$temp_file"
-                    return 0
+                    local temp_value=""
+                    if temp_value=$(cat "$temp_file"); then
+                        if [ -n "$temp_value" ] && [ "$temp_value" != "0" ]; then
+                            printf '%s' "$temp_file"
+                            return 0
+                        fi
+                    fi
                     ;;
             esac
         fi
@@ -151,6 +156,19 @@ generate_config() {
         fi
     fi
 
+    local battery_file=""
+    if [ -n "$battery_path" ]; then
+        if [ -d "$battery_path" ]; then
+            if [ -f "$battery_path/uevent" ]; then
+                battery_file="$battery_path/uevent"
+            else
+                battery_file="$battery_path"
+            fi
+        else
+            battery_file="$battery_path"
+        fi
+    fi
+
     local temperature_path=""
     if temperature_path=$(find_temperature_path); then
         :
@@ -175,7 +193,7 @@ generate_config() {
         if [ "$have_wireless" -eq 1 ]; then
             echo "order += \"wireless ${wireless_iface}\""
         fi
-        if [ -n "$battery_path" ]; then
+        if [ -n "$battery_file" ]; then
             echo "order += \"battery main\""
         fi
         echo "order += \"cpu_usage\""
@@ -237,10 +255,10 @@ disk "/" {
 EOF
         echo ""
 
-        if [ -n "$battery_path" ]; then
+        if [ -n "$battery_file" ]; then
             cat <<EOF
 battery main {
-    path = "$battery_path"
+    path = "$battery_file"
     format = "%status %percentage %remaining"
 }
 EOF
