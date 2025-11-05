@@ -32,54 +32,80 @@ interface_exists() {
 }
 
 find_battery_device() {
-    local power_path=""
-    for power_path in /sys/class/power_supply/*; do
-        [ -d "$power_path" ] || continue
-        if [ -f "$power_path/type" ]; then
-            local type=""
-            if ! type=$(cat "$power_path/type"); then
-                continue
-            fi
-            if [ "$type" = "Battery" ]; then
-                printf "%s" "$power_path"
-                return 0
-            fi
+    local node=""
+    local -a battery_nodes=()
+
+    for node in /sys/class/power_supply/*; do
+        [ -d "$node" ] || continue
+        local type_file="$node/type"
+        [ -f "$type_file" ] || continue
+        local cell_type=""
+        if ! cell_type=$(cat "$type_file"); then
+            continue
         fi
+        case "$cell_type" in
+            Battery|battery)
+                battery_nodes+=("$node")
+                ;;
+        esac
     done
 
-    # GPD Pocket first generation often ships a max170xx fuel gauge
-    if [ -d "/sys/class/power_supply/max170xx_battery" ]; then
-        printf '%s' "/sys/class/power_supply/max170xx_battery"
+    if [ "${#battery_nodes[@]}" -gt 0 ]; then
+        printf "%s" "${battery_nodes[0]}"
         return 0
     fi
+
+    # Late fallbacks suit units like the GPD Pocket fuel gauge
+    local known_paths=(
+        "/sys/class/power_supply/max170xx_battery"
+        "/sys/class/power_supply/bq27500-battery"
+        "/sys/class/power_supply/bq24190-battery"
+        "/sys/class/power_supply/BAT0"
+        "/sys/class/power_supply/BAT1"
+    )
+
+    local known=""
+    for known in "${known_paths[@]}"; do
+        if [ -d "$known" ]; then
+            printf "%s" "$known"
+            return 0
+        fi
+    done
 
     return 1
 }
 
 find_temperature_path() {
     local zone=""
+    local -a thermal_candidates=()
+
     for zone in /sys/class/thermal/thermal_zone*; do
         [ -d "$zone" ] || continue
         local type_file="$zone/type"
         local temp_file="$zone/temp"
-        if [ -f "$type_file" ] && [ -f "$temp_file" ]; then
-            local zone_type=""
-            if ! zone_type=$(cat "$type_file"); then
-                continue
-            fi
-            case "$zone_type" in
-                x86_pkg_temp|cpu_thermal|soc_thermal|acpitz|k10temp|pch_cannonlake)
-                    local temp_value=""
-                    if temp_value=$(cat "$temp_file"); then
-                        if [ -n "$temp_value" ] && [ "$temp_value" != "0" ]; then
-                            printf '%s' "$temp_file"
-                            return 0
-                        fi
-                    fi
-                    ;;
-            esac
+        if [ ! -f "$type_file" ] || [ ! -f "$temp_file" ]; then
+            continue
         fi
+        local zone_type=""
+        if ! zone_type=$(cat "$type_file"); then
+            continue
+        fi
+        case "$zone_type" in
+            x86_pkg_temp|cpu_thermal|soc_thermal|acpitz|k10temp|pch_cannonlake|soc_dts0|soc_dts1|soc_dts2|soc_dts3)
+                local reading=""
+                if reading=$(cat "$temp_file"); then
+                    if [ -n "$reading" ] && [ "$reading" != "0" ]; then
+                        thermal_candidates+=("$temp_file")
+                    fi
+                fi
+                ;;
+        esac
     done
+
+    if [ "${#thermal_candidates[@]}" -gt 0 ]; then
+        printf "%s" "${thermal_candidates[0]}"
+        return 0
+    fi
 
     local hwmon=""
     for hwmon in /sys/class/hwmon/hwmon*; do
@@ -90,17 +116,22 @@ find_temperature_path() {
         if ! hwmon_name=$(cat "$name_file"); then
             continue
         fi
-
-        local input=""
         case "$hwmon_name" in
-            coretemp|k10temp|zenpower|cpu_thermal|soc_thermal)
+            coretemp|k10temp|zenpower|cpu_thermal|soc_thermal|soc_dts0|soc_dts1|soc_dts2|soc_dts3)
+                local input=""
                 for input in "$hwmon"/temp*_input; do
                     [ -f "$input" ] || continue
-                    printf '%s' "$input"
-                    return 0
+                    local value=""
+                    if value=$(cat "$input"); then
+                        if [ -n "$value" ] && [ "$value" != "0" ]; then
+                            printf "%s" "$input"
+                            return 0
+                        fi
+                    fi
                 done
                 ;;
             *)
+                local input=""
                 for input in "$hwmon"/temp*_input; do
                     [ -f "$input" ] || continue
                     local label_file="${input%_input}_label"
@@ -110,9 +141,14 @@ find_temperature_path() {
                             continue
                         fi
                         case "$label" in
-                            *CPU*|*Tctl*|*Package*)
-                                printf '%s' "$input"
-                                return 0
+                            *CPU*|*Tctl*|*Package*|*SoC*)
+                                local value=""
+                                if value=$(cat "$input"); then
+                                    if [ -n "$value" ] && [ "$value" != "0" ]; then
+                                        printf "%s" "$input"
+                                        return 0
+                                    fi
+                                fi
                                 ;;
                         esac
                     fi
@@ -121,29 +157,9 @@ find_temperature_path() {
         esac
     done
 
-    # Late fallback for GPD Pocket thermal readouts
-    local gpd_hwmon=""
-    for gpd_hwmon in /sys/class/hwmon/hwmon*; do
-        [ -d "$gpd_hwmon" ] || continue
-        local gpd_name_file="$gpd_hwmon/name"
-        [ -f "$gpd_name_file" ] || continue
-        local gpd_name=""
-        if ! gpd_name=$(cat "$gpd_name_file"); then
-            continue
-        fi
-        case "$gpd_name" in
-            soc_dts0|soc_dts1|soc_dts2|soc_dts3|coretemp)
-                for input in "$gpd_hwmon"/temp*_input; do
-                    [ -f "$input" ] || continue
-                    printf '%s' "$input"
-                    return 0
-                done
-                ;;
-        esac
-    done
-
     return 1
 }
+
 
 generate_config() {
     # Permit override for battery location

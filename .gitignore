@@ -323,7 +323,6 @@ wallpaper.jpg
 
 !.gitignore
 !config
-!i3status.conf
 !theme.conf
 !wallpaper.jpg.example
 !scripts/
