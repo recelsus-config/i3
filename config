@@ -12,7 +12,7 @@ bar {
   font pango:Hackgen Console NF 12
   separator_symbol " / "
 
-  status_command i3status --config ~/.config/i3/i3status.conf
+  status_command ~/.config/i3/scripts/i3status_wrapper.sh
   colors {
     background #2E3440
     statusline #E5E9F0

@@ -1,10 +1,330 @@
-*
-!.gitignore
+# -----------------------------
+# OS / Editor / IDE
+# -----------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.tags
+tags
+.idea/
+.vscode/
+.history/
+.cache/
+.ccache/
+*.orig
+*.rej
 
+# -----------------------------
+# Build System (CMake, Make, Ninja, etc.)
+# -----------------------------
+/build/
+/build-*/
+/cmake-build-*/
+
+# CMake中間物
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+Testing/
+_install/
+_depends/
+# Dependency with FetchContent or CPM.cmake
+/_deps/
+
+# Ninja
+.build/
+.ninja_deps
+.ninja_log
+build.ninja
+
+# Make
+*.o
+*.lo
+*.obj
+*.gch
+*.pch
+
+# Library / Binary
+*.a
+*.la
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# LTO and Debug Symbols
+*.lto
+*.dSYM/
+*.pdb
+
+# -----------------------------
+# Tooling / Analysis
+# -----------------------------
+compile_commands.json
+.ccls-cache/
+
+# AST / IR
+*.gcno
+*.gcda
+*.gcov
+*.profraw
+*.profdata
+lcov.info
+coverage/
+sanitizer*.log
+valgrind*.log
+
+# -----------------------------
+# Temporary Files / Logs
+# -----------------------------
+*.log
+logs/
+*.pid
+*.sock
+tmp/
+run/
+
+# -----------------------------
+# SQLite Files
+# -----------------------------
+*.db
+*.db-shm
+*.db-wal
+
+# -----------------------------
+# certificates / Keys
+# -----------------------------
+*.pem
+*.crt
+*.key
+google-credentials.json
+
+# -----------------------------
+# package managers
+# -----------------------------
+# Conan
+.conan/
+conanbuild/
+conaninfo.txt
+
+# vcpkg
+vcpkg_installed/
+vcpkg*.log
+
+# CPM.cmake cache
+CPMCache/
+
+# -----------------------------
+# Containerization
+# -----------------------------
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+# -----------------------------
+# Shell History / REPL
+# -----------------------------
+.bash_history
+.zsh_history
+.fish_history
+.psql_history
+.mysql_history
+.lesshst
+.python_history
+.node_repl_history
+.history
+
+# -----------------------------
+# Node / Frontend
+# -----------------------------
+node_modules/
+dist/
+.npm/
+.pnpm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.cache-loader/
+.bower_components/
+.pnp.*
+.svelte-kit/
+.storybook/
+.vercel/
+.next/
+.nuxt/
+.vuepress/dist/
+.hugo_build.lock
+*.tsbuildinfo
+
+# -----------------------------
+# Python
+# -----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+.venv/
+venv/
+ENV/
+env/
+.ipynb_checkpoints/
+pip-wheel-metadata/
+.tox/
+.nox/
+.coverage
+coverage.xml
+htmlcov/
+wheels/
+.eggs/
+.eggs?
+share/
+.python-version
+.mdmiplugin
+
+# -----------------------------
+# Ruby / Rails
+# -----------------------------
+vendor/bundle/
+.bundle/
+tmp/pids/
+tmp/cache/
+tmp/sockets/
+.byebug_history
+.ruby-version
+.ruby-gemset
+
+# -----------------------------
+# Go
+# -----------------------------
+bin/
+pkg/
+*.test
+cover.out
+
+# -----------------------------
+# Rust
+# -----------------------------
+target/
+**/*.rs.bk
+Cargo.toml.orig
+
+# -----------------------------
+# Java / Kotlin / JVM
+# -----------------------------
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+.gradle/
+.gradle-cache/
+.gradle-test-kit/
+.classpath
+.project
+.settings/
+.idea_modules/
+.cache-main/
+build/
+out/
+
+# -----------------------------
+# Swift / iOS / Xcode
+# -----------------------------
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# -----------------------------
+# Terraform / Infra-as-Code
+# -----------------------------
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+
+# -----------------------------
+# Docker / Container
+# -----------------------------
+.docker/
+.dockerignore.local
+Dockerfile.local
+nohup.out
+
+# -----------------------------
+# Secrets / Credentials
+# -----------------------------
+*.secret
+*.secrets
+*.keystore
+*.p12
+secrets/
+
+# -----------------------------
+# Direnv / Env Managers
+# -----------------------------
+.direnv/
+.envrc
+
+# -----------------------------
+# Miscellaneous Editors / Tools
+# -----------------------------
+*.sublime-workspace
+*.sublime-project
+.fleet/
+.viminfo
+.vim/
+.idea_modules/
+*.tmproj
+*.tmproject
+*.bak
+*.tmp
+*.temp
+
+# -----------------------------
+# Project-specific
+# -----------------------------
+environment
+local/
+cache/
+workspace/
+
+
+!.env.example
+
+# -----------------------------
+# i3 Configuration
+# -----------------------------
+gitignore
+i3status.generated.*
+wallpaper.jpg
+
+!.gitignore
 !config
 !i3status.conf
 !theme.conf
 !wallpaper.jpg.example
-
 !scripts/
 !scripts/*.sh
