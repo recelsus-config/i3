@@ -27,7 +27,7 @@ bar {
 
 floating_modifier $mod
 
-bindsym $mod+Return exec ghostty
+bindsym $mod+Return exec --no-startup-id ~/.config/i3/scripts/launch_terminal.sh
 bindsym $mod+q kill
 
 bindsym $mod+Left focus left
