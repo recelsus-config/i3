@@ -46,6 +46,13 @@ find_battery_device() {
             fi
         fi
     done
+
+    # GPD Pocket first generation often ships a max170xx fuel gauge
+    if [ -d "/sys/class/power_supply/max170xx_battery" ]; then
+        printf '%s' "/sys/class/power_supply/max170xx_battery"
+        return 0
+    fi
+
     return 1
 }
 
@@ -108,6 +115,28 @@ find_temperature_path() {
                 ;;
         esac
     done
+
+    # Late fallback for GPD Pocket thermal readouts
+    local gpd_hwmon=""
+    for gpd_hwmon in /sys/class/hwmon/hwmon*; do
+        [ -d "$gpd_hwmon" ] || continue
+        local gpd_name_file="$gpd_hwmon/name"
+        [ -f "$gpd_name_file" ] || continue
+        local gpd_name=""
+        if ! gpd_name=$(cat "$gpd_name_file"); then
+            continue
+        fi
+        case "$gpd_name" in
+            soc_dts0|soc_dts1|soc_dts2|soc_dts3|coretemp)
+                for input in "$gpd_hwmon"/temp*_input; do
+                    [ -f "$input" ] || continue
+                    printf '%s' "$input"
+                    return 0
+                done
+                ;;
+        esac
+    done
+
     return 1
 }
 
