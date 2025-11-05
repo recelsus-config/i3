@@ -5,3 +5,6 @@
 !i3status.conf
 !theme.conf
 !wallpaper.jpg.example
+
+!scripts/
+!scripts/*.sh
