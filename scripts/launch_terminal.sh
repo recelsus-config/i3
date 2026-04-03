@@ -1,6 +1,6 @@
 #!/bin/sh
 
-preferred_terminals="ghostty alacritty x-terminal-emulator xterm"
+preferred_terminals="alacritty ghostty x-terminal-emulator xterm"
 
 for terminal_cmd in $preferred_terminals; do
   if command -v "$terminal_cmd" >/dev/null 2>&1; then
