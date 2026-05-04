@@ -1,7 +1,7 @@
 set $mod Mod4
 
-font pango:Hackgen Console NF 15
-bindsym $mod+space exec dmenu_run -fn 'HackGen Console NF-15' -nb '#222222' -nf '#eeeeee' -sb '#005577' -sf '#ffffff'
+font pango:JetBrainsMono Nerd Font Mono 15
+bindsym $mod+space exec dmenu_run -fn 'JetBrainsMono Nerd Font Mono' -nb '#222222' -nf '#eeeeee' -sb '#005577' -sf '#ffffff'
 
 set $update && killall -SIGUSR1 i3status
 exec_always --no-startup-id "feh --bg-fill ~/.config/i3/wallpaper.jpg"
@@ -9,7 +9,7 @@ exec_always --no-startup-id "feh --bg-fill ~/.config/i3/wallpaper.jpg"
 bar {
   position top
   strip_workspace_numbers yes
-  font pango:Hackgen Console NF 12
+  font pango:JetBrainsMono Nerd Font Mono 12
   separator_symbol " / "
 
   status_command ~/.config/i3/scripts/i3status_wrapper.sh
